@@ -48,8 +48,28 @@
                         <a class="btn" :class="mxlLoaded ? '' : 'disabled'" v-on:click="broadcastRecording">{{ recordBtnText }}</a>
                     </div>
                 </fieldset>
-                <fieldset>
+                <fieldset v-if="recordingStats.length > 0">
                     <legend>Recording Results</legend>
+                    <table>
+                        <thead>
+                            <tr>
+                                <td>Time</td>
+                                <td>Similarity</td>
+                                <td>Tempo and beat</td>
+                                <td>Frequency</td>
+                                <td>Pitch</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="recordingStat in recordingStats">
+                                <td>{{ recordingStat.date }}</td>
+                                <td>{{ recordingStat.analysis[0] }}</td>
+                                <td>{{ recordingStat.analysis[1] }}</td>
+                                <td>{{ recordingStat.analysis[2] }}</td>
+                                <td>{{ recordingStat.analysis[3] }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </fieldset>
             </div>
         </section>
@@ -82,8 +102,31 @@
                     </div>
                     <div class="row">
                         <label></label>
-                        <a class="btn disabled" v-on:click="broadcastRecording">{{ recordBtnText }}</a>
+                        <a class="btn" v-on:click="startRecording">{{ recordBtnText }}</a>
                     </div>
+                </fieldset>
+                <fieldset v-if="recordingStats.length > 0">
+                    <legend>Recording Results</legend>
+                    <table>
+                        <thead>
+                            <tr>
+                                <td>Date/Time</td>
+                                <td>Similarity</td>
+                                <td>Tempo and beat</td>
+                                <td>Frequency</td>
+                                <td>Pitch</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="recordingStat in recordingStats">
+                                <td>{{ recordingStat.date.toLocaleString() }}</td>
+                                <td>{{ recordingStat.analysis[0] }}</td>
+                                <td>{{ recordingStat.analysis[1] }}</td>
+                                <td>{{ recordingStat.analysis[2] }}</td>
+                                <td>{{ recordingStat.analysis[3] }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </fieldset>
             </div>
         </section>

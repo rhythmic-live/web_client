@@ -261,9 +261,7 @@ function load_new_xml(xml_src, callback) {
     function() {
         osmd.Zoom = 0.75;
         osmd.render();
-        console.log('asdf 2');
         if (callback) {
-            console.log('asdf');
             callback();
         }
     }

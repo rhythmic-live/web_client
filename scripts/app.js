@@ -20,6 +20,7 @@ var appConductor = new Vue({
     endMeasure: 1,
     performanceTempo: 0,
     mxlLoaded: false,
+    recordingStats: [],
   },
   methods: {
     promptMxl: function(e) {
@@ -53,8 +54,14 @@ var appConductor = new Vue({
         Tone.start().then(function() {
           this.recordBtnText = 'Stop Recording';
           this.isCurrentlyRecording++;
-          playSong(null, false, this.startMeasure, this.endMeasure);
-          socket.emit('start');
+          playSong(null, false, this.startMeasure, this.endMeasure, function() {
+            // on start
+            socket.emit('start', [this.startMeasure, this.endMeasure, this.performanceTempo]);
+          }, function() {
+            // on end
+            this.broadcastRecording(null);
+            socket.emit('stop');
+          });
         }.bind(this));
       } else if (this.isCurrentlyRecording >= 2) {
         this.recordBtnText = 'Start Recording';
@@ -71,8 +78,8 @@ var appConductor = new Vue({
 var appParticipant = new Vue({
   el: '#participant-controls',
   data: {
-    isCurrentlyRecording: 0,
-    recordBtnText: 'Start Recording',
+    isReadyToRecord: 0,
+    recordBtnText: 'Ready to Record',
     mxlFile: '',
     mxlPath: '',
     startMeasure: 0,
@@ -81,12 +88,14 @@ var appParticipant = new Vue({
     mxlLoaded: false,
     focusInstrument: '',
     instruments: [],
+    recordingStats: [
+      {date: new Date(), analysis: [0.3, 0.1, 0.65, 1]}
+    ],
   },
   methods: {
     promptMxl: function(e) {
       // document.getElementById('userFilePrompter').click();
-      socket.on("xml_return", function(xml) {
-        console.log(xml);
+      socket.on('xml_return', function(xml) {
         load_new_xml(xml, function() {
           this.endMeasure = osmd.sheet.LastMeasureNumber + 1;
           this.performanceTempo = osmd.sheet.defaultStartTempoInBpm;
@@ -95,38 +104,29 @@ var appParticipant = new Vue({
         }.bind(this));
       }.bind(this));
 
-      socket.on("start-participants", function(e) {
-        this.broadcastRecording();
-      }.bind(this))
+      socket.on('start-participants', function(data) {
+        this.startMeasure = data[0];
+        this.endMeasure = data[1];
+        this.performanceTempo = data[2];
+        this.startRecording();
+      }.bind(this));
+
+      socket.on('analytics', function (e) {
+        this.recordingStats.push({
+          date: new Date(),
+          analysis: e
+        });
+      }.bind(this));
     },
-    loadMxl: function(file) {
-      this.mxlFile = file;
-      this.mxlPath = file.name;
-
-      var reader = new FileReader();
-
-      // here we tell the reader what to do when it's done reading...
-      reader.onload = function(readerEvent) {
-        var content = readerEvent.target.result; // this is the content!
-        load_new_xml(content, function() {
-          this.endMeasure = osmd.sheet.LastMeasureNumber + 1;
-          this.performanceTempo = osmd.sheet.defaultStartTempoInBpm;
-          this.mxlLoaded = true;
-          this.instruments = getInstruments();
-        }.bind(this));
-      }.bind(this);
-
-      // read the file
-      reader.readAsText(file, 'UTF-8');
-    },
-    broadcastRecording: function(e) {
-      if (!this.mxlLoaded) return;
-      if (this.isCurrentlyRecording < 2) {
-        // TODO: broadcast recording started message
-        this.isCurrentlyRecording = 1;
+    startRecording: function(e) {
+      if (this.isReadyToRecord == 0) {
+        this.isReadyToRecord += 1;
+        this.recordBtnText = 'Waiting for conductor...';
+      } else {
         Tone.start().then(function() {
-          this.recordBtnText = 'Stop Recording';
+          this.recordBtnText = 'Recording...';
           this.isCurrentlyRecording++;
+
           let focusInstruments = [];
           if (this.focusInstrument.length == 0)
             focusInstruments = null;
@@ -134,11 +134,8 @@ var appParticipant = new Vue({
             focusInstruments = [this.focusInstrument];
 
           playSong(focusInstruments, false, this.startMeasure, this.endMeasure);
+          this.isReadyToRecord = true;
         }.bind(this));
-      } else if (this.isCurrentlyRecording >= 2) {
-        this.recordBtnText = 'Start Recording';
-        this.isCurrentlyRecording = 0;
-        stopSong();
       }
     },
     updateBpm: function(e) {
@@ -167,6 +164,9 @@ let hideLanding = function(showConductorAfter) {
   }
   landing.classList.add('hidden');
   logoBar.classList.add('logo-topleft');
+  logoBar.addEventListener('click', function() {
+    window.location.reload(false);
+  });
   setTimeout(function() {
     if (showConductorAfter) showConductor();
     else showParticipant();
@@ -194,7 +194,7 @@ let showParticipant = function() {
   // fetch and load the music
   primaryApp.promptMxl();
 
-  socket.emit("get_xml", "");
+  socket.emit('get_xml', '');
 };
 
 
