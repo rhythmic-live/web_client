@@ -74,7 +74,7 @@ var quietSampler = new Tone.Sampler({
     baseUrl: "https://tonejs.github.io/audio/salamander/"
 }).toDestination();
 
-quietSampler.volume.value = -10;
+quietSampler.volume.value = -15;
 
 var MIDI_NUM_NAMES = ["C_1", "C#_1", "D_1", "D#_1", "E_1", "F_1", "F#_1", "G_1", "G#_1", "A_1", "A#_1", "B_1",
                 "C0", "C#0", "D0", "D#0", "E0", "F0", "F#0", "G0", "G#0", "A0", "A#0", "B0",
