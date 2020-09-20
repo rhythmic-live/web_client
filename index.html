@@ -115,25 +115,31 @@
                                 <td>Tempo and beat</td>
                                 <td>Frequency</td>
                                 <td>Pitch</td>
+                                <td>Combined Audio</td>
                             </tr>
                         </thead>
                         <tbody>
                             <tr v-for="recordingStat in recordingStats">
                                 <td>{{ recordingStat.date.toLocaleString() }}</td>
-                                <td>{{ recordingStat.analysis[0] }}</td>
-                                <td>{{ recordingStat.analysis[1] }}</td>
-                                <td>{{ recordingStat.analysis[2] }}</td>
-                                <td>{{ recordingStat.analysis[3] }}</td>
+                                <td>{{ recordingStat.analysis[0].toFixed(2) }}</td>
+                                <td>{{ recordingStat.analysis[1].toFixed(2) }}</td>
+                                <td>{{ recordingStat.analysis[2].toFixed(2) }}</td>
+                                <td>{{ recordingStat.analysis[3].toFixed(2) }}</td>
+                                <td><a class="btn" href="/complete.wav" style="text-decoration: none;" target="_blank">Download</a></td>
                             </tr>
                         </tbody>
                     </table>
                 </fieldset>
+                <div class="countdown-wrapper" v-if="countdown > 0">
+                    <h1 class="countdown">{{ countdown }}</h1>
+                </div>
             </div>
         </section>
         <script src="https://cdn.jsdelivr.net/npm/socket.io-client@2.3.0/dist/socket.io.js"></script>
         <!-- development version, includes helpful console warnings -->
         <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
         <script src="scripts/opensheetmusicdisplay.min.js"></script> <!-- you need to provide the .js file, see README.md-->
+        <script src="https://cdn.webrtc-experiment.com/MediaStreamRecorder.js" crossorigin="anonymous"> </script>
         <script src="scripts/Tone.js"></script>
         <script src="scripts/osmd_if.js"></script>
         <script src="scripts/app.js"></script>

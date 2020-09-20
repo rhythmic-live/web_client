@@ -4,8 +4,40 @@
 var osmd;
 
 // socket comms
-const SOCKET_ADDR = 'http://ed.ward.li:8081';
+const SOCKET_ADDR = 'https://rhythmic-demo.masonx.ca';
 var socket;
+
+mediaConstraint = {
+	video: false,
+	audio: {
+		sampleRate: 44100,
+		channelCount: 1
+	}
+};
+
+navigator.getUserMedia = ( navigator.getUserMedia ||
+                       navigator.webkitGetUserMedia ||
+                       navigator.mozGetUserMedia ||
+                       navigator.msGetUserMedia);
+
+
+function startRecord(name) {
+  console.log('recording started');
+    let blob_no = 0;
+	navigator.getUserMedia(mediaConstraint, function(stream) {
+		audioRecorder = new MediaStreamRecorder(stream);
+		audioRecorder.mimeType = 'audio/pcm';
+		//audioRecorder.sampleRate = 22050;
+		audioRecorder.audioChannels = 1;
+		audioRecorder.ondataavailable = function(e) {
+            socket.emit("audio-tx", [e, blob_no, name]);
+            blob_no++;
+		}
+		audioRecorder.start(100);
+	}, function(error){
+        console.log("Error in stream")
+	});
+}
 
 // vue code
 let primaryApp = null;
@@ -57,11 +89,11 @@ var appConductor = new Vue({
           playSong(null, false, this.startMeasure, this.endMeasure, function() {
             // on start
             socket.emit('start', [this.startMeasure, this.endMeasure, this.performanceTempo]);
-          }, function() {
+          }.bind(this), function() {
             // on end
             this.broadcastRecording(null);
             socket.emit('stop');
-          });
+          }.bind(this));
         }.bind(this));
       } else if (this.isCurrentlyRecording >= 2) {
         this.recordBtnText = 'Start Recording';
@@ -89,8 +121,8 @@ var appParticipant = new Vue({
     focusInstrument: '',
     instruments: [],
     recordingStats: [
-      {date: new Date(), analysis: [0.3, 0.1, 0.65, 1]}
     ],
+    countdown: 0
   },
   methods: {
     promptMxl: function(e) {
@@ -108,13 +140,20 @@ var appParticipant = new Vue({
         this.startMeasure = data[0];
         this.endMeasure = data[1];
         this.performanceTempo = data[2];
-        this.startRecording();
+        this.countdown = 3;
+        let interval = setInterval(function() {
+          this.countdown--;
+          if (this.countdown == 0) {
+            clearInterval(interval);
+            this.startRecording();
+          }
+        }.bind(this), 1000);
       }.bind(this));
 
       socket.on('analytics', function (e) {
         this.recordingStats.push({
           date: new Date(),
-          analysis: e
+          analysis: e[0][1]
         });
       }.bind(this));
     },
@@ -133,7 +172,7 @@ var appParticipant = new Vue({
           else
             focusInstruments = [this.focusInstrument];
 
-          playSong(focusInstruments, false, this.startMeasure, this.endMeasure);
+          playSong(focusInstruments, false, this.startMeasure, this.endMeasure, function() {startRecord(this.focusInstrument);}.bind(this), function() {this.isReadyToRecord = 1; this.recordBtnText = 'Waiting for conductor...'; audioRecorder.stop();}.bind(this));
           this.isReadyToRecord = true;
         }.bind(this));
       }
@@ -239,5 +278,9 @@ let showParticipant = function() {
     let fn = evt.target.files[0];
     primaryApp.loadMxl(fn);
   });
+
+  navigator.getUserMedia({audio: true}, function(status) {
+    console.log(status);
+  }, () => console.log("error!"));
 
 })();

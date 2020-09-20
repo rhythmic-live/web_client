@@ -174,7 +174,6 @@ input:disabled {
     width: auto !important;
     opacity: 100 !important;
     transition: 0.2s all;
-    background: pink;
 }
 
 /* conductor */
@@ -250,6 +249,14 @@ select {
     outline: none;
 }
 
+th {
+    font-weight: bold;
+}
+
+td {
+    padding: 0.3em;
+}
+
 .input-fullwidth {
     width: 20em;
 }
@@ -266,3 +273,13 @@ select {
 fieldset + fieldset {
     margin-top: 1em;
 }
+
+.countdown-wrapper {
+    text-align: center;
+    margin: 1em 0;
+}
+
+.countdown {
+    font-size: 5em;
+}
+

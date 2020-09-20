@@ -239,7 +239,7 @@ function playSong(emphasizedVoice=null, onlyEmphasized=false, start=0, end=osmd.
         Tone.Transport.cancel();
         Tone.Transport.stop();
         loop.dispose();
-        if (encCallback != null) endCallback();
+        if (endCallback != null) endCallback();
     }, max_time-(min_time * (60/bpm)));
 
     Tone.Transport.start();
