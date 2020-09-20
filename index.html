@@ -48,7 +48,7 @@
                         <a class="btn" :class="mxlLoaded ? '' : 'disabled'" v-on:click="broadcastRecording">{{ recordBtnText }}</a>
                     </div>
                 </fieldset>
-                <fieldset>
+                <fieldset v-if="recordingStats.length > 0">
                     <legend>Recording Results</legend>
                     <table>
                         <thead>
@@ -102,10 +102,10 @@
                     </div>
                     <div class="row">
                         <label></label>
-                        <a class="btn disabled" v-on:click="broadcastRecording">{{ recordBtnText }}</a>
+                        <a class="btn" v-on:click="startRecording">{{ recordBtnText }}</a>
                     </div>
                 </fieldset>
-                <fieldset>
+                <fieldset v-if="recordingStats.length > 0">
                     <legend>Recording Results</legend>
                     <table>
                         <thead>
