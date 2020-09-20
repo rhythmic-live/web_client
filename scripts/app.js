@@ -1,10 +1,15 @@
-/* global Vue, opensheetmusicdisplay, load_new_xml, playSong, stopSong, Tone */
+/* global Vue, opensheetmusicdisplay, load_new_xml, playSong, stopSong, Tone, io, getInstruments */
 
 // osmd
 var osmd;
 
+// socket comms
+const SOCKET_ADDR = 'http://localhost:8081';
+var socket;
+
 // vue code
-var app = new Vue({
+let primaryApp = null;
+var appConductor = new Vue({
   el: '#conductor-controls',
   data: {
     isCurrentlyRecording: 0,
@@ -33,22 +38,26 @@ var app = new Vue({
           this.endMeasure = osmd.sheet.LastMeasureNumber + 1;
           this.performanceTempo = osmd.sheet.defaultStartTempoInBpm;
           this.mxlLoaded = true;
+          socket.emit('update_xml', content);
         }.bind(this));
       }.bind(this);
-    
+
       // read the file
       reader.readAsText(file, 'UTF-8');
     },
     broadcastRecording: function(e) {
+      if (!this.mxlLoaded) return;
       if (this.isCurrentlyRecording < 2) {
         // TODO: broadcast recording started message
         this.isCurrentlyRecording = 1;
         Tone.start().then(function() {
-          playSong(null, false, this.startMeasure, this.endMeasure);
-          this.recordBtnText = "Stop Recording";
+          this.recordBtnText = 'Stop Recording';
           this.isCurrentlyRecording++;
-        });
+          playSong(null, false, this.startMeasure, this.endMeasure);
+          socket.emit('start');
+        }.bind(this));
       } else if (this.isCurrentlyRecording >= 2) {
+        this.recordBtnText = 'Start Recording';
         this.isCurrentlyRecording = 0;
         stopSong();
       }
@@ -59,14 +68,84 @@ var app = new Vue({
   }
 });
 
+var appParticipant = new Vue({
+  el: '#participant-controls',
+  data: {
+    isCurrentlyRecording: 0,
+    recordBtnText: 'Start Recording',
+    mxlFile: '',
+    mxlPath: '',
+    startMeasure: 0,
+    endMeasure: 1,
+    performanceTempo: 0,
+    mxlLoaded: false,
+    focusInstrument: '',
+    instruments: [],
+  },
+  methods: {
+    promptMxl: function(e) {
+      document.getElementById('userFilePrompter').click();
+    },
+    loadMxl: function(file) {
+      this.mxlFile = file;
+      this.mxlPath = file.name;
+
+      var reader = new FileReader();
+
+      // here we tell the reader what to do when it's done reading...
+      reader.onload = function(readerEvent) {
+        var content = readerEvent.target.result; // this is the content!
+        load_new_xml(content, function() {
+          this.endMeasure = osmd.sheet.LastMeasureNumber + 1;
+          this.performanceTempo = osmd.sheet.defaultStartTempoInBpm;
+          this.mxlLoaded = true;
+          this.instruments = getInstruments();
+        }.bind(this));
+      }.bind(this);
+
+      // read the file
+      reader.readAsText(file, 'UTF-8');
+    },
+    broadcastRecording: function(e) {
+      if (!this.mxlLoaded) return;
+      if (this.isCurrentlyRecording < 2) {
+        // TODO: broadcast recording started message
+        this.isCurrentlyRecording = 1;
+        Tone.start().then(function() {
+          this.recordBtnText = 'Stop Recording';
+          this.isCurrentlyRecording++;
+          playSong(this.focusInstrument, true, this.startMeasure, this.endMeasure);
+        }.bind(this));
+      } else if (this.isCurrentlyRecording >= 2) {
+        this.recordBtnText = 'Start Recording';
+        this.isCurrentlyRecording = 0;
+        stopSong();
+      }
+    },
+    updateBpm: function(e) {
+      osmd.sheet.defaultStartTempoInBpm = this.performanceTempo;
+    }
+  }
+});
+
+
+
 // native
 let hideLanding = function(showConductorAfter) {
   var landing = document.getElementById('landing');
   var logoBar = document.getElementById('logo-bar');
-  if (showConductorAfter)
+
+  // connect to socket
+  socket = io.connect(SOCKET_ADDR);
+
+  // update visibility of stuff
+  if (showConductorAfter) {
     document.getElementById('conductor').classList.remove('actuallyHidden');
-  else
+    primaryApp = appConductor;
+  } else {
     document.getElementById('participant').classList.remove('actuallyHidden');
+    primaryApp = appParticipant;
+  }
   landing.classList.add('hidden');
   logoBar.classList.add('logo-topleft');
   setTimeout(function() {
@@ -78,22 +157,23 @@ let hideLanding = function(showConductorAfter) {
 let showConductor = function() {
   document.getElementById('landing').classList.add('actuallyHidden');
   document.getElementById('conductor').classList.add('showing');
-  osmd = new opensheetmusicdisplay.OpenSheetMusicDisplay("conductor-sheet-music");
+  osmd = new opensheetmusicdisplay.OpenSheetMusicDisplay('conductor-sheet-music');
   osmd.setOptions({
-      backend: "svg",
-      followCursor: true
+    backend: 'svg',
+    followCursor: true
   });
-
 };
 
 let showParticipant = function() {
   document.getElementById('landing').classList.add('actuallyHidden');
   document.getElementById('participant').classList.add('showing');
-  osmd = new opensheetmusicdisplay.OpenSheetMusicDisplay("participant-sheet-music");
+  osmd = new opensheetmusicdisplay.OpenSheetMusicDisplay('participant-sheet-music');
   osmd.setOptions({
-      backend: "svg",
+      backend: 'svg',
       followCursor: true
   });
+  // fetch and load the music
+  primaryApp.promptMxl();
 };
 
 
@@ -105,8 +185,8 @@ let showParticipant = function() {
   var isFirstJoin = true;
 
   // TODO: debug code; delete when done
-  sessionCode.innerHTML = 'Session code: <code>TSLACALLS</code>';
-  hideLanding(true);
+  //sessionCode.innerHTML = 'Session code: <code>TSLACALLS</code>';
+  //hideLanding(true);
 
   // create button
   createBtn.addEventListener('click', function() {
@@ -136,7 +216,7 @@ let showParticipant = function() {
   // user file prompter
   document.getElementById('userFilePrompter').addEventListener('input', function(evt) {
     let fn = evt.target.files[0];
-    app.loadMxl(fn);
+    primaryApp.loadMxl(fn);
   });
 
 })();

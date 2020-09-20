@@ -189,7 +189,9 @@ function stopSong() {
 
 function playSong(emphasizedVoice=null, onlyEmphasized=false, start=0, end=osmd.sheet.LastMeasureNumber+1) {
     stopSong();
+    console.log(emphasizedVoice, onlyEmphasized);
     allNotes = getNotes(start, end, emphasizedVoice);
+    console.log(allNotes);
     quietNotes = allNotes[0];
     loudNotes = allNotes[1];
     bpm = osmd.sheet.defaultStartTempoInBpm;
