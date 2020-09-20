@@ -187,7 +187,7 @@ function stopSong() {
     if (loop != null) loop.dispose();
 }
 
-function playSong(emphasizedVoice=null, onlyEmphasized=false, start=0, end=osmd.sheet.LastMeasureNumber+1) {
+function playSong(emphasizedVoice=null, onlyEmphasized=false, start=0, end=osmd.sheet.LastMeasureNumber+1, startCallback=null, endCallback=null) {
     stopSong();
     console.log(emphasizedVoice, onlyEmphasized);
     allNotes = getNotes(start, end, emphasizedVoice);
@@ -209,6 +209,8 @@ function playSong(emphasizedVoice=null, onlyEmphasized=false, start=0, end=osmd.
         if (loudNotes[i].time < min_time) min_time = loudNotes[i].time;
     }
 
+    startCallback();
+    
     if (!onlyEmphasized) {
         for (var i = 0; i < quietNotes.length; i++) {
             end_time = (quietNotes[i].duration + quietNotes[i].time) * (60/bpm);
@@ -237,6 +239,7 @@ function playSong(emphasizedVoice=null, onlyEmphasized=false, start=0, end=osmd.
         Tone.Transport.cancel();
         Tone.Transport.stop();
         loop.dispose();
+        if (encCallback != null) endCallback();
     }, max_time-(min_time * (60/bpm)));
 
     Tone.Transport.start();
