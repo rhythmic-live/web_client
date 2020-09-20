@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>rhythmic</title>
+        <link href="https://fonts.googleapis.com/css2?family=Lora&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="styles/app.css">
+    </head>
+    <body>
+        <header class="logo-center" id="logo-bar">
+            <div class="brand-logo"></div>
+            <h1 class="brand-name">rhythmic<span class="brand-orange">.live</span></h1>
+        </header>
+        <section id="landing">
+            <div class="row">
+                <a id="btn-create" class="btn btn-primary landing-btn">Create</a>
+            </div>
+            <div class="row">
+                <div class="row-ct">
+                    <input class="input-hidden" id="input-sesscode" type="text" placeholder="Session Code" />
+                    <a id="btn-join" class="btn btn-primary landing-btn">Join</a>
+                </div>
+            </div>
+        </section>
+        <section id="conductor" class="actuallyHidden">
+            <div class="sheet-music-area">
+                sheet music ehre
+            </div>
+            <div class="controls-area">
+                <h1>conductor</h1>
+            </div>
+        </section>
+        <section id="participant" class="actuallyHidden">
+            <div class="sheet-music-area">
+                sheet music here
+            </div>
+            <div class="controls-area">
+                <h1>participant</h1>
+            </div>
+        </section>
+        <!-- development version, includes helpful console warnings -->
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+        <!-- production version, optimized for size and speed -->
+        <!-- <script src="https://cdn.jsdelivr.net/npm/vue"></script> -->
+        <script src="scripts/app.js"></script>
+    </body>
+</html>

@@ -1,0 +1,185 @@
+body {
+    font-family: 'Lora', sans-serif;
+    padding: 0;
+    margin: 0.5em 0;
+}
+
+:root {
+    --main-color: rgb(254, 142, 36);
+    --main-color-darker: rgb(198, 105, 16);
+    --main-fg-color: #FFFFFF;
+    --comp-color: #DE2700;
+    --comp-color-darker: #B32000;
+    --grid-max-width: 750px; /* calc(100% - 5em); */
+    /* if switching to calc(100% - 5em); change the search bar, too */
+    --nav-max-width: 750px;
+}
+
+.row {
+    margin: 0.5em 0;
+}
+
+.row-ct {
+    display: flex;
+    align-items: center;
+}
+
+h1 {
+    margin: 0;
+}
+
+.btn {
+    display: inline-block;
+    padding: 0.5em 1em;
+    background: var(--main-color);
+    cursor: pointer;
+    color: white;
+    box-sizing: border-box;
+    transition: all 0.2s;
+}
+
+.btn:hover {
+    background: var(--main-color-darker);
+}
+
+input {
+    font-size: 1em;
+    font-family: 'Lora', sans-serif;
+    padding: 0.5em 0.5em;
+    background-color: #fff;
+    transition: all 0.2s;
+    outline: none;
+    height: 36px;
+    border: 1px solid black;
+    box-sizing: border-box;
+}
+
+/* branding */
+.logo-center {
+    text-align: center;
+    width: 200px;
+    margin: 0 auto;
+    margin-top: calc(50vh - 10em);
+}
+
+.brand-logo {
+    background: url('../resources/logo.png');
+    background-repeat: no-repeat;
+    background-position: center; 
+    background-size: contain;
+}
+
+.logo-center .brand-logo {
+    height: 100px;
+    width: 100px;
+    margin: 0 auto;
+}
+
+.brand-orange {
+    color: var(--main-color);
+}
+
+/* landing */
+#landing {
+    width: 200px;
+    margin: 1em auto;
+}
+
+.input-hidden {
+    width: 0;
+    margin: 0;
+    padding: 0;
+    border: none;
+}
+
+.landing-btn {
+    width: 200px;
+}
+
+.landing-btn-collapsed {
+    width: 30px;
+    padding: 0.5em;
+    text-align: center;
+}
+
+.input-expanded {
+    width: 170px;
+}
+
+.hidden {
+    margin: 0 !important;
+    height: 0 !important;
+    padding: 0 !important;
+    opacity: 0 !important;
+    transition: 0.2s all;
+}
+
+.actuallyHidden {
+    display: none;
+}
+
+.logo-topleft {
+    text-align: left;
+    width: 100%;
+    margin-top: 0;
+    margin-bottom: 0.5em;
+    transition: 0.2s all;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.logo-topleft .brand-logo {
+    height: 25px;
+    width: 30px;
+    margin: 0 0.5em 0 0;
+    display: inline-block;
+    transition: 0.2s all;
+}
+
+.logo-topleft .brand-name {
+    display: inline-block;
+    margin: 0;
+    font-size: 1.3em;
+    transition: 0.2s all;
+}
+
+.showing {
+    height: auto !important;
+    width: auto !important;
+    opacity: 100 !important;
+    transition: 0.2s all;
+    background: pink;
+}
+
+/* conductor */
+#conductor {
+    height: 0;
+    opacity: 0;
+}
+
+/* participant */
+#participant {
+    height: 0;
+    opacity: 0;
+}
+
+/* common */
+.sheet-music-area, .controls-area {
+    display: block;
+    position: absolute;
+    bottom: 0;
+    background: pink;
+    top: 2.5em;
+    width: calc(50% - 0.2em);
+}
+
+.sheet-music-area {
+    left: 0;
+}
+
+.controls-area {
+    right: 0;
+}
+
+
