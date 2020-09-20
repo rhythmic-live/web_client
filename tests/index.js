@@ -99,6 +99,7 @@ function getNotes(start, end, emphasizedVoice=null) {
 
     while(iterator.currentMeasureIndex < end){
         const voices = iterator.CurrentVoiceEntries;
+        if (voices == undefined) break;
         for(var i = 0; i < voices.length; i++){
             const v = voices[i];
             const name = v.parentVoice.parent.nameLabel.text;
@@ -154,6 +155,7 @@ function getStartingNote(start, voice) {
     const iterator = osmd.cursor.Iterator;
 
     while (iterator.currentMeasureIndex < osmd.sheet.LastMeasureNumber+1) {
+        console.log(voices);
         const voices = iterator.CurrentVoiceEntries;
         for (var i = 0; i < voices.length; i++) {
             const v = voices[i];
