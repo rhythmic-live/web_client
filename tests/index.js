@@ -250,3 +250,13 @@ function moveToMeasure(measure) {
     osmd.cursor.reset();
     while (osmd.cursor.iterator.currentMeasureIndex < measure) osmd.cursor.next();
 }
+
+function load_new_xml(xml_src) {
+    osmd.load(xml_src).then(
+    function() {
+        osmd.Zoom = 0.75;
+        osmd.render();
+        document.getElementById("bpm").value = osmd.sheet.defaultStartTempoInBpm;
+    }
+  );
+}

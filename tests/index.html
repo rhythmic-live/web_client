@@ -28,13 +28,7 @@
       backend: "svg",
       followCursor: true
   });
-  osmd.load("http://localhost:8000/resources/BrahWiMeSample.musicxml").then(
-    function() {
-        osmd.Zoom = 0.75;
-        osmd.render();
-        document.getElementById("bpm").value = osmd.sheet.defaultStartTempoInBpm;
-    }
-  );
+  load_new_xml("http://localhost:8000/resources/BrahWiMeSample.musicxml");
 </script>
 
 </body>
