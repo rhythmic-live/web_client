@@ -226,7 +226,7 @@ function playSong(emphasizedVoice=null, onlyEmphasized=false, start=0, end=osmd.
     loop = new Tone.Loop((timen) => {
         time = timen - start_time;
         while (osmd.cursor.iterator.currentTimeStamp.realValue+getCursorDuration() < (((time / (60/bpm))+min_time) / 4)) osmd.cursor.next();
-    }, "32hz").start(0);
+    }, "16hz").start(0);
 
     Tone.Transport.scheduleOnce((time) => {
         osmd.cursor.hide();

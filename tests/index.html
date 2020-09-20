@@ -10,13 +10,17 @@
 <script src="opensheetmusicdisplay.min.js"></script> <!-- you need to provide the .js file, see README.md-->
 <script src="Tone.js"></script>
 <script src="index.js"></script>
-<div id="osmdCanvas" style="overflow-y: scroll; width:70%; height:100%;" />
 
 <button onclick="Tone.start().then(() => {
     console.log('audio ready');
 }); playSong();">Play Song</button>
 
 <button onclick="stopSong();">Stop Song</button>
+
+<input type="text" id="bpm"></input>
+<button onclick="osmd.sheet.defaultStartTempoInBpm = document.getElementById('bpm').value;">Set BPM</button>
+
+<div id="osmdCanvas" style="overflow-y: scroll; width:70%; height:100%;"></div>
 
 <script>
   var osmd = new opensheetmusicdisplay.OpenSheetMusicDisplay("osmdCanvas");
@@ -28,6 +32,7 @@
     function() {
         osmd.Zoom = 0.75;
         osmd.render();
+        document.getElementById("bpm").value = osmd.sheet.defaultStartTempoInBpm;
     }
   );
 </script>
