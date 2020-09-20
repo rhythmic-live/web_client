@@ -9,6 +9,7 @@
         <header class="logo-center" id="logo-bar">
             <div class="brand-logo"></div>
             <h1 class="brand-name">rhythmic<span class="brand-orange">.live</span></h1>
+            <div id="session-code" class="session-code"></div>
         </header>
         <section id="landing">
             <div class="row">
@@ -21,16 +22,39 @@
                 </div>
             </div>
         </section>
+        <input type="file" style="display: none;" id="userFilePrompter">
         <section id="conductor" class="actuallyHidden">
-            <div class="sheet-music-area">
-                sheet music ehre
+            <div id="conductor-sheet-music" class="sheet-music-area">
             </div>
-            <div class="controls-area">
-                <h1>conductor</h1>
+            <div id="conductor-controls" class="controls-area">
+                <fieldset>
+                    <legend>Conductor</legend>
+                    <div class="row">
+                        <label for="musicxml">Music XML file:</label>
+                        <input disabled class="input-fullwidth" type="text" id="musicxml" name="musicxml" v-model="mxlPath">
+                        <a class="btn" v-on:click="promptMxl">Select</a>
+                    </div>
+                    <div class="row">
+                        <label for="startmeas">Range (measures): </label>
+                        <input :disabled="!mxlLoaded" class="input-halfwidth" type="number" id="startmeas" v-model.number="startMeasure" name="startmeas" placeholder="0">
+                        <input :disabled="!mxlLoaded" class="input-halfwidth" type="number" id="endmeas" v-model.number="endMeasure" name="endmeas" placeholder="end">
+                    </div>
+                    <div class="row">
+                        <label for="startmeas">Tempo: </label>
+                        <input :disabled="!mxlLoaded" class="input-halfwidth" type="number" id="tempo" v-model.number="performanceTempo" name="tempo" placeholder="70" v-on:blur="updateBpm">
+                    </div>
+                    <div class="row">
+                        <label></label>
+                        <a class="btn" :class="mxlLoaded ? '' : 'disabled'" v-on:click="broadcastRecording">{{ recordBtnText }}</a>
+                    </div>
+                </fieldset>
+                <fieldset>
+                    <legend>Recording Results</legend>
+                </fieldset>
             </div>
         </section>
         <section id="participant" class="actuallyHidden">
-            <div class="sheet-music-area">
+            <div id="participant-sheet-music" class="sheet-music-area">
                 sheet music here
             </div>
             <div class="controls-area">
@@ -39,6 +63,9 @@
         </section>
         <!-- development version, includes helpful console warnings -->
         <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+        <script src="scripts/opensheetmusicdisplay.min.js"></script> <!-- you need to provide the .js file, see README.md-->
+        <script src="scripts/Tone.js"></script>
+        <script src="scripts/osmd_if.js"></script>
         <!-- production version, optimized for size and speed -->
         <!-- <script src="https://cdn.jsdelivr.net/npm/vue"></script> -->
         <script src="scripts/app.js"></script>
