@@ -1,0 +1,36 @@
+<html>
+<head>
+	<title> OSMD Raw Javascript Usage Example - CORS Version</title>
+</head>
+<body>
+
+<!-- You need to set up a local server, see README. Might fail due to CORS restrictions. -->
+<!-- (run http-server ./resources -p 8080 --cors before this) -->
+
+<script src="opensheetmusicdisplay.min.js"></script> <!-- you need to provide the .js file, see README.md-->
+<script src="Tone.js"></script>
+<script src="index.js"></script>
+<div id="osmdCanvas" style="overflow-y: scroll; width:70%; height:100%;" />
+
+<button onclick="Tone.start().then(() => {
+    console.log('audio ready');
+}); playSong();">Play Song</button>
+
+<button onclick="stopSong();">Stop Song</button>
+
+<script>
+  var osmd = new opensheetmusicdisplay.OpenSheetMusicDisplay("osmdCanvas");
+  osmd.setOptions({
+      backend: "svg",
+      followCursor: true
+  });
+  osmd.load("http://localhost:8000/resources/tlby.musicxml").then(
+    function() {
+        osmd.Zoom = 0.75;
+        osmd.render();
+    }
+  );
+</script>
+
+</body>
+</html>
