@@ -71,7 +71,7 @@
                     </div>
                     <div class="row">
                         <label for="instrument">Instrument: </label>
-                        <select class="input-halfwidth" :disabled="!mxlLoaded" name="instrument" v-bind="focusInstrument">
+                        <select class="input-halfwidth" :disabled="!mxlLoaded" name="instrument" v-model="focusInstrument">
                             <option value="">None</option>
                             <option v-for="item in instruments" :value="item">{{ item }}</option>
                         </select>

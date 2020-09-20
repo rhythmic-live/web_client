@@ -114,7 +114,13 @@ var appParticipant = new Vue({
         Tone.start().then(function() {
           this.recordBtnText = 'Stop Recording';
           this.isCurrentlyRecording++;
-          playSong(this.focusInstrument, true, this.startMeasure, this.endMeasure);
+          let focusInstruments = [];
+          if (this.focusInstrument.length == 0)
+            focusInstruments = null;
+          else
+            focusInstruments = [this.focusInstrument];
+
+          playSong(focusInstruments, false, this.startMeasure, this.endMeasure);
         }.bind(this));
       } else if (this.isCurrentlyRecording >= 2) {
         this.recordBtnText = 'Start Recording';
