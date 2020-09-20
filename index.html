@@ -110,7 +110,7 @@
                     <table>
                         <thead>
                             <tr>
-                                <td>Time</td>
+                                <td>Date/Time</td>
                                 <td>Similarity</td>
                                 <td>Tempo and beat</td>
                                 <td>Frequency</td>
@@ -119,7 +119,7 @@
                         </thead>
                         <tbody>
                             <tr v-for="recordingStat in recordingStats">
-                                <td>{{ recordingStat.date }}</td>
+                                <td>{{ recordingStat.date.toLocaleString() }}</td>
                                 <td>{{ recordingStat.analysis[0] }}</td>
                                 <td>{{ recordingStat.analysis[1] }}</td>
                                 <td>{{ recordingStat.analysis[2] }}</td>

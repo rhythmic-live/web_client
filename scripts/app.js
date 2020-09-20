@@ -82,12 +82,14 @@ var appParticipant = new Vue({
     mxlLoaded: false,
     focusInstrument: '',
     instruments: [],
-    recordingStats: [],
+    recordingStats: [
+      {date: new Date(), analysis: [0.3, 0.1, 0.65, 1]}
+    ],
   },
   methods: {
     promptMxl: function(e) {
       // document.getElementById('userFilePrompter').click();
-      socket.on("xml_return", function(xml) {
+      socket.on('xml_return', function(xml) {
         console.log(xml);
         load_new_xml(xml, function() {
           this.endMeasure = osmd.sheet.LastMeasureNumber + 1;
@@ -97,29 +99,16 @@ var appParticipant = new Vue({
         }.bind(this));
       }.bind(this));
 
-      socket.on("start-participants", function(e) {
+      socket.on('start-participants', function(e) {
         this.broadcastRecording();
-      }.bind(this))
-    },
-    loadMxl: function(file) {
-      this.mxlFile = file;
-      this.mxlPath = file.name;
+      }.bind(this));
 
-      var reader = new FileReader();
-
-      // here we tell the reader what to do when it's done reading...
-      reader.onload = function(readerEvent) {
-        var content = readerEvent.target.result; // this is the content!
-        load_new_xml(content, function() {
-          this.endMeasure = osmd.sheet.LastMeasureNumber + 1;
-          this.performanceTempo = osmd.sheet.defaultStartTempoInBpm;
-          this.mxlLoaded = true;
-          this.instruments = getInstruments();
-        }.bind(this));
-      }.bind(this);
-
-      // read the file
-      reader.readAsText(file, 'UTF-8');
+      socket.on('analytics', function (e) {
+        this.recordingStats.push({
+          date: new Date(),
+          analysis: e
+        });
+      }.bind(this));
     },
     broadcastRecording: function(e) {
       if (!this.mxlLoaded) return;
@@ -196,7 +185,7 @@ let showParticipant = function() {
   // fetch and load the music
   primaryApp.promptMxl();
 
-  socket.emit("get_xml", "");
+  socket.emit('get_xml', '');
 };
 
 
