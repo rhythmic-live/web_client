@@ -20,6 +20,7 @@ var appConductor = new Vue({
     endMeasure: 1,
     performanceTempo: 0,
     mxlLoaded: false,
+    recordingStats: [],
   },
   methods: {
     promptMxl: function(e) {
@@ -81,6 +82,7 @@ var appParticipant = new Vue({
     mxlLoaded: false,
     focusInstrument: '',
     instruments: [],
+    recordingStats: [],
   },
   methods: {
     promptMxl: function(e) {
