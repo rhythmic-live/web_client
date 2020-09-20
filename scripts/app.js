@@ -4,7 +4,7 @@
 var osmd;
 
 // socket comms
-const SOCKET_ADDR = 'http://localhost:8081';
+const SOCKET_ADDR = 'http://ed.ward.li:8081';
 var socket;
 
 // vue code
@@ -39,7 +39,7 @@ var appConductor = new Vue({
           this.endMeasure = osmd.sheet.LastMeasureNumber + 1;
           this.performanceTempo = osmd.sheet.defaultStartTempoInBpm;
           this.mxlLoaded = true;
-          socket.emit('update_xml', content);
+          socket.emit('update_xml', [content, file.name]);
         }.bind(this));
       }.bind(this);
 
@@ -86,7 +86,20 @@ var appParticipant = new Vue({
   },
   methods: {
     promptMxl: function(e) {
-      document.getElementById('userFilePrompter').click();
+      // document.getElementById('userFilePrompter').click();
+      socket.on("xml_return", function(xml) {
+        console.log(xml);
+        load_new_xml(xml, function() {
+          this.endMeasure = osmd.sheet.LastMeasureNumber + 1;
+          this.performanceTempo = osmd.sheet.defaultStartTempoInBpm;
+          this.mxlLoaded = true;
+          this.instruments = getInstruments();
+        }.bind(this));
+      }.bind(this));
+
+      socket.on("start-participants", function(e) {
+        this.broadcastRecording();
+      }.bind(this))
     },
     loadMxl: function(file) {
       this.mxlFile = file;
@@ -182,6 +195,8 @@ let showParticipant = function() {
   });
   // fetch and load the music
   primaryApp.promptMxl();
+
+  socket.emit("get_xml", "");
 };
 
 
