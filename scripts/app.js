@@ -4,7 +4,7 @@
 var osmd;
 
 // socket comms
-const SOCKET_ADDR = 'https://rhythmic-demo.masonx.ca';
+const SOCKET_ADDR = 'https://api.rhythmic.live';
 var socket;
 
 mediaConstraint = {
